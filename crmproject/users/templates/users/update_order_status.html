@@ -1,0 +1,13 @@
+{% extends 'users/base.html' %}
+{% block title %}Update Order Status{% endblock %}
+{% block content %}
+<h2>Update Status for Order #{{ order.id }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Update Status</button>
+</form>
+
+<a href="{% url 'all_orders' %}" class="btn btn-secondary mt-3">Back to Orders</a>
+{% endblock %}

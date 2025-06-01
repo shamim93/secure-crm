@@ -1,0 +1,12 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Home - CRM{% endblock %}
+
+{% block content %}
+    <div class="text-center">
+        <h1 class="mb-4">Welcome to the CRM</h1>
+        <p class="lead">Manage customers, view orders, and more — based on your role.</p>
+        <a href="{% url 'login' %}" class="btn btn-primary me-2">Login</a>
+        <a href="{% url 'register' %}" class="btn btn-outline-secondary">Register</a>
+    </div>
+{% endblock %}

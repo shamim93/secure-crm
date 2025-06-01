@@ -1,0 +1,17 @@
+{% extends 'users/base.html' %}
+
+{% block title %} Delete Order {% endblock %}
+
+{% block content %}
+  <h2>Are you sure you want to delete this order?</h2>
+  <p>Order ID: {{ order.id }}<br>
+     Product: {{ order.product_name }}<br>
+     Status: {{ order.status }}<br>
+     Customer: {{ order.customer.username }}
+  </p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, Delete</button>
+  </form>
+  <a href="{% url 'view_orders' %}">Cancel</a>
+{% endblock %}

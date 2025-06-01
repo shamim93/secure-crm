@@ -1,0 +1,48 @@
+{% extends 'users/base.html' %}
+{% block title %}Your Orders{% endblock %}
+
+{% block content %}
+<h2>Your Orders</h2>
+
+{% if orders %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Date</th>
+            {% if user.user_type == "superadmin" or user.user_type == "customer" %}
+                <th>Actions</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.product_name }}</td>
+            <td>${{ order.amount }}</td>
+            <td>{{ order.get_status_display }}</td>
+            <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+
+            {% if user.user_type == "superadmin" %}
+                <td>
+                    <a href="{% url 'update_order' order.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'delete_order' order.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            {% elif user.user_type == "customer" and order.customer == user %}
+                <td>
+                    <a href="{% url 'update_order' order.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'delete_order' order.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No orders found.</p>
+{% endif %}
+
+<a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+{% endblock %}
