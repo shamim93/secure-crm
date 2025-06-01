@@ -82,8 +82,12 @@ def view_orders(request):
 
 @login_required
 def create_order(request):
-    if request.user.user_type not in ['customer','superadmin']:
+    if request.user.user_type == 'subscriber':
+        return HttpResponseForbidden("Subscribers are not allowed to create orders.")
+
+    if request.user.user_type not in ['customer', 'superadmin']:
         return redirect('dashboard')
+
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
@@ -94,6 +98,7 @@ def create_order(request):
     else:
         form = OrderForm()
     return render(request, 'users/create_order.html', {'form': form})
+
 
 
 @login_required
