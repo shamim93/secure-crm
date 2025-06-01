@@ -1,164 +1,125 @@
-# CRM Project with Django
+# CRM Project
 
-This is a customer relationship management (CRM) web application built with Django. It includes user registration, login, order management, and role-based access control.
+A Django-based CRM (Customer Relationship Management) system with user roles, order management, and PostgreSQL integration. It includes role-based access control and enhanced security using bcrypt with salt and pepper.
 
 ## 🚀 Features
 
-* User Registration & Authentication
-* Role-based Access Control (Customer, Superadmin)
-* Order Creation, Update, and Deletion
-* Profile Management
-* Admin Dashboard
-* Order Status Management (Superadmin only)
+* User authentication and registration
+* Role-based dashboards (Customer, Superadmin)
+* Order creation and management
+* Profile editing
+* Order status updates by Superadmin only
+* PostgreSQL and SQLite support
+* SonarQube integration for static code analysis
+* Secure password hashing using bcrypt with salt and pepper
 
-## 💠 Tech Stack
+## 📦 Technologies Used
 
 * Python 3.12
-* Django
-* PostgreSQL (optional alongside default SQLite)
-* SonarQube (Code Quality Analysis)
-* Salt & Pepper (Remote automation with SaltStack)
+* Django 4.x
+* PostgreSQL
+* SQLite (default, for dev)
+* SonarQube
+* bcrypt (with salt & pepper)
 
-## ⚖️ Installation
+## 🛠️ Setup Instructions
 
-1. Clone the repository:
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
+git clone https://github.com/yourusername/yourproject.git
+cd yourproject
 ```
 
-2. Create and activate a virtual environment:
+### 2. Create Virtual Environment
 
 ```bash
 python3 -m venv env
 source env/bin/activate
 ```
 
-3. Install dependencies:
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Set up environment variables securely using `python-decouple`:
+### 4. Environment Variables
 
-```bash
-# .env file
-SECRET_KEY=your_secret_key
+Create a `.env` file in the root directory:
+
+```env
+SECRET_KEY=your_django_secret_key
 DEBUG=True
-DATABASE_URL=postgres://user:password@localhost:5432/dbname
-SONAR_TOKEN=your_sonar_token
+ALLOWED_HOSTS=127.0.0.1,localhost
+DATABASE_NAME=your_db_name
+DATABASE_USER=your_db_user
+DATABASE_PASSWORD=your_db_password
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+PASSWORD_PEPPER=your_pepper_string
 ```
 
-5. Run migrations:
+### 5. Database Setup
+
+Run migrations for both databases:
 
 ```bash
-python manage.py migrate --database=default  # SQLite
-# or
-python manage.py migrate --database=postgres  # PostgreSQL (if configured in settings)
+python manage.py migrate --database=default   # For SQLite (dev)
+python manage.py migrate --database=postgres  # For PostgreSQL (prod)
 ```
 
-6. Start the development server:
+### 6. Run Server
 
 ```bash
 python manage.py runserver
 ```
 
-## 🧪 Run Tests
+## 🔐 Security: Salt and Pepper Password Hashing
 
-```bash
-python manage.py test
+This project uses **bcrypt** with both salt and pepper:
+
+* **Salt** is generated per password (handled by bcrypt).
+* **Pepper** is a secret global string stored in environment variables.
+
+### Example:
+
+```python
+import bcrypt
+import os
+
+PEPPER = os.environ.get('PASSWORD_PEPPER')
+
+def hash_password(raw_password):
+    combined = (raw_password + PEPPER).encode('utf-8')
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(combined, salt)
 ```
 
 ## 📊 SonarQube Integration
 
-To analyze code quality using SonarQube:
+To run code analysis:
 
-1. Start SonarQube server:
+1. Start SonarQube:
 
 ```bash
 cd sonarqube/bin/linux-x86-64
 ./sonar.sh start
 ```
 
-2. Run the scanner:
+2. Run scanner:
 
 ```bash
-sonar-scanner -Dsonar.projectKey=crmproject \
+sonar-scanner -Dsonar.projectKey=YourProject \
               -Dsonar.sources=. \
               -Dsonar.host.url=http://localhost:9000 \
-              -Dsonar.token=your_sonar_token
+              -Dsonar.token=your_token_here
 ```
 
-> Make sure you have SonarQube running and `sonar.token` configured correctly.
+## 🧪 Testing
 
-## 🡢🔐 Salt & Pepper Integration with SonarQube
-
-This project uses [SaltStack](https://saltproject.io) via its Python interface `pepper` for managing remote execution and optionally automating SonarQube scans across environments.
-
-### Setup Instructions
-
-#### 1. Install Pepper
+Run Django tests:
 
 ```bash
-pip install pepper
+python manage.py test
 ```
-
-#### 2. Configure Pepper (`~/.pepperrc`)
-
-```ini
-[main]
-USERNAME = your_salt_user
-PASSWORD = your_salt_password
-EAUTH = pam
-SERVER = https://your-salt-api-url
-```
-
-#### 3. Trigger SonarQube Scan via Salt
-
-```bash
-pepper --client local 'webserver*' cmd.run 'cd /srv/myapp && sonar-scanner'
-```
-
-Or using Salt state:
-
-```yaml
-sonar_scan:
-  cmd.run:
-    - name: "cd /home/app && sonar-scanner"
-    - cwd: /home/app
-```
-
-```bash
-salt 'myminion' state.apply sonar
-```
-
-### Security Notes
-
-* Do **not** store Salt credentials in the codebase.
-* Use secure authentication and access control.
-
-## 📁 Project Structure
-
-```
-crmproject/
-├── manage.py
-├── users/
-│   ├── views.py
-│   ├── models.py
-│   ├── forms.py
-│   ├── templates/
-│   └── ...
-├── crmproject/
-│   └── settings.py
-└── requirements.txt
-```
-
-## 🧑‍💻 Author
-
-Developed by Shamim.
-
----
-
-Feel free to contribute or open issues for enhancements!
