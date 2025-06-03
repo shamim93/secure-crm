@@ -13,3 +13,8 @@ class OrderViewTests(TestCase):
             password='customerpassword',
             user_type= 'customer'
         )
+        self.subscriber = User.objects.create_user(
+            username='subscriberuser',
+            password='testpass123',
+            user_type='subscriber'
+        )
