@@ -1,127 +1,139 @@
-# CRMProjecet (Django-based CRM System)
+# CRM Project
 
-A lightweight Customer Relationship Management (CRM) system built using Django. This app includes user role management (customer, superadmin, subscriber), order processing, audit logging, secure password handling, and SonarQube integration.
-
----
+A Django-based CRM (Customer Relationship Management) system with user roles, order management, and PostgreSQL integration. It includes role-based access control, secure password hashing (bcrypt with salt and pepper), and audit logging.
 
 ## 🚀 Features
 
-- User registration, login, logout
-- Role-based access (Customer, Superadmin, Subscriber)
-- Create, update, delete orders (permissions enforced)
-- Profile management for customers
-- Secure password storage using bcrypt with salt and pepper
-- Audit logging of critical actions
-- SonarQube integration for code quality analysis
+* User authentication and registration
+* Role-based dashboards (Customer, Superadmin, Subscriber)
+* Order creation and management
+* Profile editing
+* Order status updates by Superadmin only
+* PostgreSQL and SQLite support
+* Audit logging for key actions
+* SonarQube integration for static code analysis
+* Secure password hashing using bcrypt with salt and pepper
 
----
+## 📦 Technologies Used
 
-## 🛡️ Security Highlights
+* Python 3.12
+* Django 4.x
+* PostgreSQL
+* SQLite (default, for dev)
+* SonarQube
+* bcrypt (with salt & pepper)
 
-### 🔐 Password Hashing with Salt & Pepper (bcrypt)
+## 🛠️ Setup Instructions
 
-- Uses bcrypt for hashing passwords.
-- Salt is generated per password by bcrypt itself.
-- An application-level pepper is added before hashing.
-- Pepper is stored securely in environment variables using `python-decouple`.
-
-```python
-from decouple import config
-import bcrypt
-
-PEPPER = config("PASSWORD_PEPPER")
-
-def hash_password(raw_password):
-    peppered = (raw_password + PEPPER).encode()
-    return bcrypt.hashpw(peppered, bcrypt.gensalt())
-````
-
----
-
-## 🕵️ Audit Logging
-
-* Tracks user actions such as login, logout, order changes.
-* Implemented using Django signals + `auditlog` package.
-* Stores timestamps, actor, and changed fields.
-
----
-
-## 📊 Code Quality: SonarQube Integration
-
-* SonarScanner is integrated for continuous code analysis.
-* Tracks bugs, vulnerabilities, code smells, and security hotspots.
-* Configuration available in `sonar-project.properties`.
-
-Example:
-
-```properties
-sonar.projectKey=crmproject
-sonar.sources=.
-sonar.host.url=http://localhost:9000
-sonar.token=<your_token_here>
-```
-
----
-
-## 🧰 Setup Instructions
-
-1. Clone the project:
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/crmproject.git
+git clone https://github.com/shamim93/secure-crm.git
 cd crmproject
 ```
 
-2. Create and activate virtual environment:
+### 2. Create Virtual Environment
 
 ```bash
 python3 -m venv env
 source env/bin/activate
 ```
 
-3. Install dependencies:
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Configure environment variables (in `.env` file):
+### 4. Environment Variables
+
+Create a `.env` file in the root directory:
 
 ```env
+SECRET_KEY=your_django_secret_key
 DEBUG=True
-SECRET_KEY=your-secret
-DATABASE_URL=postgres://user:pass@localhost:5432/dbname
-PASSWORD_PEPPER=your-secure-pepper-string
+ALLOWED_HOSTS=127.0.0.1,localhost
+DATABASE_NAME=your_db_name
+DATABASE_USER=your_db_user
+DATABASE_PASSWORD=your_db_password
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+PASSWORD_PEPPER=your_pepper_string
 ```
 
-5. Run migrations:
+### 5. Database Setup
+
+Run migrations:
 
 ```bash
 python manage.py migrate
 ```
 
-6. Run development server:
+> ⚠️ Make sure the database user has permission to create tables and databases during testing.
+
+### 6. Run Server
 
 ```bash
 python manage.py runserver
 ```
 
----
+## 🔐 Security: Salt and Pepper Password Hashing
 
-## 🐘 Database Support
+This project uses **bcrypt** with both salt and pepper:
 
-* SQLite (default for development)
-* PostgreSQL (for production or staging)
-* Supports multiple databases using Django’s `DATABASES` config
+* **Salt** is generated per password (handled by bcrypt).
+* **Pepper** is a secret global string stored in environment variables.
 
----
+### Example:
 
-## 🔍 Future Improvements
+```python
+import bcrypt
+import os
 
-* Add Docker support
-* REST API endpoints
-* CI/CD pipeline with GitHub Actions
-* Notification system for order updates
+PEPPER = os.environ.get('PASSWORD_PEPPER')
 
----
+def hash_password(raw_password):
+    combined = (raw_password + PEPPER).encode('utf-8')
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(combined, salt)
+```
 
+## 📊 SonarQube Integration
+
+To run code analysis:
+
+1. Start SonarQube:
+
+```bash
+cd sonarqube/bin/linux-x86-64
+./sonar.sh start
+```
+
+2. Run scanner:
+
+```bash
+sonar-scanner -Dsonar.projectKey=YourProject \
+              -Dsonar.sources=. \
+              -Dsonar.host.url=http://localhost:9000 \
+              -Dsonar.token=your_token_here
+```
+
+## 📜 Audit Logging
+
+All key actions (like order creation, update, deletion) are tracked using an audit logging middleware for better traceability and debugging.
+
+## 🧪 Testing
+
+Run Django tests:
+
+```bash
+python manage.py test
+```
+
+> 🔒 Ensure the database user has sufficient permissions to create and destroy test databases.
+
+Sample unit tests are implemented for order functionality including:
+
+* Customer can create order
+* Subscriber cannot create order
+* Customer sees their own orders
