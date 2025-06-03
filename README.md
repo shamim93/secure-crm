@@ -1,14 +1,3 @@
-Thank you for the clarification!
-
-Here's an updated version of your README file that includes:
-
-* 🔐 Salt & Pepper-based password hashing using bcrypt
-* 🕵️‍♂️ Audit logging
-* 📊 SonarQube integration
-
----
-
-````markdown
 # CRMProjecet (Django-based CRM System)
 
 A lightweight Customer Relationship Management (CRM) system built using Django. This app includes user role management (customer, superadmin, subscriber), order processing, audit logging, secure password handling, and SonarQube integration.
