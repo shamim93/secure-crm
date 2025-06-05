@@ -1,7 +1,10 @@
 {% extends 'users/base.html' %}
 {% block content %}
 <h2 style="text-transform:capitalize">{{ user_type }} Dashboard</h2>
-<p>Welcome, {{ request.user.username }}!</p>
+{% if show_welcome %}
+  <p>Welcome, {{ request.user.username }}!</p>
+{% endif %}
+
 <a href="{% url 'logout' %}">Logout</a>
 <h4>Your Profile</h4>
 <ul>
