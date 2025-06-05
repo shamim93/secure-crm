@@ -39,7 +39,16 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user:
                 login(request, user)
-                return redirect('dashboard')
+                response = redirect('dashboard')
+                response.set_cookie(
+                    key='ui_theme',
+                    value='dark', 
+                    max_age=60 * 60 * 24 * 30,
+                    secure=False,
+                    httponly=True,
+                    samesite='Lax'
+                )
+                return response
     else:
         form = LoginForm()
     return render(request, 'users/login.html', {'form': form})
@@ -52,7 +61,22 @@ def logout_view(request):
 
 @login_required
 def dashboard_view(request):
-    return render(request, 'users/dashboard.html', {'user_type': request.user.user_type})
+    first_visit = request.COOKIES.get('first_visit', 'true') == 'true'
+    response = render(request, 'users/dashboard.html', {
+        'user_type': request.user.user_type,
+        'show_welcome': first_visit
+    })
+
+    if first_visit:
+        response.set_cookie(
+            'first_visit',
+            'false',
+            max_age=3600,
+            secure=False,
+            httponly=True,
+            samesite='Lax'
+        )
+    return response
 
 
 @login_required
