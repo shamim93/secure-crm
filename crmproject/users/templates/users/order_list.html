@@ -29,7 +29,8 @@
                 <td>
                     <a href="{% url 'update_order' order.id %}" class="btn btn-sm btn-warning">Edit</a>
                     <a href="{% url 'delete_order' order.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                </td>
+                    <a href="{% url 'update_order_status' order.id %}" class="btn btn-sm btn-primary">Update Status</a>               
+                 </td>
             {% elif user.user_type == "customer" and order.customer == user %}
                 <td>
                     <a href="{% url 'update_order' order.id %}" class="btn btn-sm btn-warning">Edit</a>
